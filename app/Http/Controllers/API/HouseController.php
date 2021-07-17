@@ -21,7 +21,7 @@ class HouseController extends Controller
      *
      * @route 'api/houses'
      *
-     * @param HouseIndexRequest $request
+     * @param  HouseIndexRequest  $request
      * @return JsonResponse
      * */
     public function index(HouseIndexRequest $request): JsonResponse
@@ -50,11 +50,12 @@ class HouseController extends Controller
             if ($request->filled('garages')) {
                 $housesQuery->where('garages', $request->get('garages'));
             }
-            $houses = $housesQuery->get();
+            $houses = $housesQuery->paginate();
 
             return $this->sendResponse($houses->toArray());
         } catch (Exception $e) {
             Log::error('HouseController@index: '.$e->getMessage());
+
             return $this->sendError('Failed to get data');
         }
     }

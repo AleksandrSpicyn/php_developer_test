@@ -6,31 +6,31 @@
         <el-main>
             <el-form ref="houseFilter" :model="form" :inline="true">
                 <el-form-item prop="name">
-                    <el-input v-model="form.name" placeholder="Name" @input="onSubmit"></el-input>
+                    <el-input v-model="form.name" placeholder="Name" @input="onSubmit" @change="onSubmit"></el-input>
                 </el-form-item>
                 <el-form-item prop="min_price">
                     <el-input-number v-model.number="form.min_price" placeholder="Min. price" :min=0
-                                     @input="onSubmit"></el-input-number>
+                                     @input="onSubmit" @change="onSubmit"></el-input-number>
                 </el-form-item>
                 <el-form-item prop="max_price">
                     <el-input-number v-model.number="form.max_price" placeholder="Max. price" :min=0
-                                     @input="onSubmit"></el-input-number>
+                                     @input="onSubmit" @change="onSubmit"></el-input-number>
                 </el-form-item>
                 <el-form-item prop="bedrooms">
                     <el-input-number v-model.number="form.bedrooms" placeholder="Bedrooms" :min=0
-                                     @input="onSubmit"></el-input-number>
+                                     @input="onSubmit" @change="onSubmit"></el-input-number>
                 </el-form-item>
                 <el-form-item prop="bathrooms">
                     <el-input-number v-model.number="form.bathrooms" placeholder="Bathrooms" :min=0
-                                     @input="onSubmit"></el-input-number>
+                                     @input="onSubmit" @change="onSubmit"></el-input-number>
                 </el-form-item>
                 <el-form-item prop="storeys">
                     <el-input-number v-model.number="form.storeys" placeholder="Storeys" :min=0
-                                     @input="onSubmit"></el-input-number>
+                                     @input="onSubmit" @change="onSubmit"></el-input-number>
                 </el-form-item>
                 <el-form-item prop="garages">
                     <el-input-number v-model.number="form.garages" placeholder="Garages" :min=0
-                                     @input="onSubmit"></el-input-number>
+                                     @input="onSubmit" @change="onSubmit"></el-input-number>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="resetForm()">Reset</el-button>
@@ -67,6 +67,15 @@
                     label="Garages">
                 </el-table-column>
             </el-table>
+            <div class="pagination">
+                <el-pagination
+                    background
+                    @current-change="paginate"
+                    :page-size="perPage"
+                    layout="prev, pager, next"
+                    :total="total">
+                </el-pagination>
+            </div>
         </el-main>
     </el-container>
 </template>
@@ -78,7 +87,9 @@ export default {
             tableData: [],
             form: {},
             timeout: null,
-            loading: true
+            loading: true,
+            total: 0,
+            perPage: 0,
         }
     },
 
@@ -87,14 +98,20 @@ export default {
     },
 
     methods: {
-        getData(formData) {
+        getData() {
             this.loading = true;
             axios
                 .get('/api/houses', {
-                    params: formData
+                    params: this.form
                 })
                 .then(response => {
-                    response.data.success ? this.tableData = response.data.data : console_log(response.data.message)
+                    if (response.data.success) {
+                        this.tableData = response.data.data.data
+                        this.total = response.data.data.total
+                        this.perPage = response.data.data.per_page
+                    } else {
+                        console.log(response.data.message)
+                    }
                     this.loading = false
                 })
                 .catch(error => {
@@ -105,8 +122,12 @@ export default {
         onSubmit() {
             if (this.timeout) clearTimeout(this.timeout)
             this.timeout = setTimeout(() => {
-                this.getData(this.form)
+                this.getData()
             }, 300)
+        },
+        paginate(page) {
+            this.form.page = page
+            this.getData()
         },
         resetForm() {
             this.$refs['houseFilter'].resetFields();
@@ -116,7 +137,12 @@ export default {
 </script>
 
 <style>
-.el-header{
+.el-header {
     padding-top: 1.5rem;
+}
+
+.pagination {
+    justify-content: center;
+    margin-top: 1rem;
 }
 </style>
