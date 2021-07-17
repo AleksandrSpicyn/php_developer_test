@@ -3,7 +3,7 @@ PHP Developer Test
 
 Houses table example. Laravel 8, Vue.js 2.6, Element UI.
 
-![alt text](https://github.com/AleksandrSpicyn/php_developer_test/blob/master/public/images/screenshot.png?raw=true)
+![alt text](https://github.com/AleksandrSpicyn/php_developer_test/blob/master/resources/images/screenshot.png?raw=true)
 
 Laravel install
 ----------------------
